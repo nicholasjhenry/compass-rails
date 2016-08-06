@@ -1,4 +1,6 @@
-klass = if defined?(Sass::Rails::SassTemplate)
+klass = if defined?(Sprockets::SassProcessor)
+  Sprockets::SassProcessor
+elsif defined?(Sass::Rails::SassTemplate)
   Sass::Rails::SassTemplate
 else
   Sprockets::SassTemplate
@@ -69,12 +71,14 @@ klass.class_eval do
 
   # if using haml-rails, self.class.parent = Haml::Filters (which doesn't have an implementation)
   def sass_importer_class
-    @sass_importer_class ||= if defined?(self.class.parent::SassImporter)
-                               self.class.parent::SassImporter
+    @sass_importer_class ||= if defined?(self.class.parent::SassProcessor)
+                               self.class.parent::SassProcessor
+                             elsif defined?(Sass::Rails::SassProcessor)
+                               Sass::Rails::SassProcessor
                              elsif defined?(Sass::Rails::SassTemplate)
-                               Sass::Rails::SassImporter
+                               Sass::Rails::SassProcessor
                              else
-                               Sprockets::SassImporter
+                               Sprockets::SassProcessor
                              end
   end
 
